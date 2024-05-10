@@ -115,8 +115,7 @@ async def test_crawler():
     site_url = 'http://d1'
     page_cacher = PageCacher()
     crawler = Crawler(site_url=site_url, page_cacher=page_cacher, request_maker=FakeRequestMaker(),
-                      page_parser=PageParser(url=site_url), timeout=0, allowed_content_types=['text/html'],
-                      threads_cont=2, sleep_seconds=0)
+                      page_parser=PageParser(url=site_url), timeout=0, threads_cont=2, sleep_seconds=0)
     await crawler.crawl()
 
     keys = await page_cacher.get_keys()

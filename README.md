@@ -4,6 +4,10 @@
 > pip install requests pytest pytest-asyncio
 
 
+## RUNNING
+
+> python __main__.py http://localhost ~/tmpdir/
+
 ## CLASSES
 
 
