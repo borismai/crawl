@@ -1,3 +1,9 @@
+INSTALLATION
+
+
+pip install requests pytest pytest-asyncio
+
+
 CLASSES
 
 
@@ -39,7 +45,9 @@ More logging
 
 CLI interface using argparse
 
-Use http lib with session support
+Input arguments validation
+
+Use http sessions
 
 Separate session for every worker
 
