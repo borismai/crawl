@@ -1,37 +1,43 @@
-INSTALLATION
+## INSTALLATION
 
 
-pip install requests pytest pytest-asyncio
+> pip install requests pytest pytest-asyncio
 
 
-CLASSES
+## CLASSES
 
 
- - PageParser
+### PageParser
 
 Made for getting links from page content
 
+*Here we can fetch more links getting form tags*
 
- - PageCacher
+
+### PageCacher
 
 Keeps downloaded pages with unique URLs
 
+*We can use some key-value facility, may be it is possible to use filesystem to store content*
 
- - RequestMaker
+
+### RequestMaker
 
 Downloads pages, checks content type
 
+*TODO: Add sessions, add custom request headers, act more human-like. Use referrers, generate real track*
 
- - Crawler
+### Crawler
 
 Main class.
 Uses methods of requester, parser and cacher to get work done.
 Also has method "dump downloaded pages".
 Logging goes here.
 
+*TODO: Spread requests to other hosts, url_to_request queue may be some MQ server*
 
 
-TODO:
+## TODO:
 
 Handle form tags
 
