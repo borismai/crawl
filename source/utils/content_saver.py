@@ -22,6 +22,8 @@ class ContentSaver:
     @classmethod
     def save_page(cls, content_path: Path, url: str, content: str) -> Path:
         filepath = cls.get_absolute_path(content_path, url)
+        if not filepath.parent.exists():
+            filepath.parent.mkdir(parents=True, exist_ok=True)
         filepath.write_text(content)
 
         return filepath
