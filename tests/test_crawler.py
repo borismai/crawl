@@ -1,3 +1,4 @@
+from asyncio import sleep
 from unittest import mock
 from urllib.parse import urlparse
 
@@ -47,6 +48,13 @@ EXPECTED_SAVING_MESSAGES = {
 class FakeRequestMaker(RequestMaker):
     def __init__(self):
         super(FakeRequestMaker, self).__init__(timeout=1, allowed_content_types=[])
+        self.urls_requested = set()
+
+    async def make_get_request(self, url: str) -> str:
+        await sleep(0.1)
+        assert url not in self.urls_requested
+        self.urls_requested.add(url)
+        return await super(FakeRequestMaker, self).make_get_request(url)
 
     def get_request_sync(self, url: str) -> str:
         data_dir = Path(__file__).parent / 'data' / 'crawler'
@@ -62,7 +70,7 @@ class FakeRequestMaker(RequestMaker):
         elif path.is_dir():
             path = path / 'index.html'
             if path.is_file():
-                result =  path.read_text()
+                result = path.read_text()
         if result is None:
             raise ValueError('not found')
 
