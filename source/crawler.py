@@ -41,8 +41,9 @@ class Crawler:
             finished, current_tasks = await asyncio.wait(current_tasks, return_when=asyncio.FIRST_COMPLETED)
             while self.urls_to_process and len(current_tasks) < self.threads_cont:
                 url = self.urls_to_process.pop(0)
-                await self.page_cacher.set_item(url=url, status=PageCacheItemStatus.PENDING)
-                current_tasks.add(asyncio.create_task(self.process_url(url)))
+                if not await self.page_cacher.get_item(url=url):
+                    await self.page_cacher.set_item(url=url, status=PageCacheItemStatus.PENDING)
+                    current_tasks.add(asyncio.create_task(self.process_url(url)))
 
     async def process_url(self, url: str) -> None:
         try:
