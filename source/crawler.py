@@ -16,13 +16,14 @@ from utils.url_normaliser import URLNormaliser
 class Crawler:
     def __init__(self, site_url: str, page_cacher: PageCacherAbstract,
                  request_maker: RequestMakerAbstract, page_parser: PageParserAbstract, timeout: int,
-                 threads_cont: int, sleep_seconds: int):
+                 threads_cont: int, sleep_seconds: int, empty_loop_sleep_seconds: float = 0.1):
         self.page_cacher = page_cacher
         self.request_maker = request_maker
         self.page_parser = page_parser
         self.timeout = timeout
         self.threads_cont = threads_cont
         self.sleep_seconds = sleep_seconds
+        self.empty_loop_sleep_seconds = empty_loop_sleep_seconds
 
         site_url_norm = URLNormaliser.normalise_url(site_url)
         url_parsed = urlparse(site_url_norm)
@@ -38,7 +39,13 @@ class Crawler:
         current_tasks = set()
         current_tasks.add(asyncio.create_task(self.process_url(self.site_url)))
         while self.urls_to_process or not await self.page_cacher.finished() or current_tasks:
+            self.log(f'current_tasks len: {len(current_tasks)}')
             finished, current_tasks = await asyncio.wait(current_tasks, return_when=asyncio.FIRST_COMPLETED)
+
+            if not self.urls_to_process:
+                self.log('no new urls to process')
+                await sleep(self.empty_loop_sleep_seconds)
+
             while self.urls_to_process and len(current_tasks) < self.threads_cont:
                 url = self.urls_to_process.pop(0)
                 if not await self.page_cacher.get_item(url=url):

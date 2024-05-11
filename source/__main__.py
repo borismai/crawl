@@ -14,7 +14,8 @@ async def main():
     allowed_content = ['text/html']
     crawler = Crawler(site_url=site_url, page_cacher=PageCacher(),
                       request_maker=RequestMaker(allowed_content_types=allowed_content, timeout=10),
-                      page_parser=PageParser(url=site_url), timeout=0, threads_cont=2, sleep_seconds=0)
+                      page_parser=PageParser(url=site_url), timeout=0, threads_cont=2, sleep_seconds=0,
+                      empty_loop_sleep_seconds=0.1)
 
     await crawler.crawl()
     await crawler.dump(content_path=content_dir)
