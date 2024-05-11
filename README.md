@@ -15,14 +15,14 @@
 
 Made for getting links from page content
 
-*Here we can fetch more links getting form tags*
+*Here we can fetch more links getting them from form tags*
 
 
 ### [PageCacher](source/page_cacher/page_cacher.py)
 
 Keeps downloaded pages with unique URLs
 
-*We can use some key-value facility, may be it is possible to use filesystem to store content*
+*We can use some key-value facility, may be it is better to use filesystem to store content*
 
 
 ### [RequestMaker](source/request_maker/request_maker.py)
@@ -38,7 +38,7 @@ Uses methods of requester, parser and cacher to get work done.
 Also has method "dump downloaded pages".
 Logging goes here.
 
-*TODO: Spread requests to other hosts, url_to_request queue may be some MQ server*
+*TODO: Spread requests to other hosts, url_to_request queue may be some queue server*
 
 
 ## TODO:
