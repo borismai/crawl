@@ -6,7 +6,7 @@
 
 ## RUNNING
 
-> python __main__.py http://localhost ~/tmpdir/
+> python &#95;&#95;main&#95;&#95;.py http://localhost ~/tmpdir/
 
 ## CLASSES
 
