@@ -2,24 +2,25 @@ import asyncio
 import datetime
 from asyncio import sleep
 from pathlib import Path
-from typing import List
 from urllib.parse import urlparse
 
+from content_saver.content_saver_abstract import ContentSaverAbstract
 from page_cacher.page_cache_item import PageCacheItemStatus
 from page_cacher.page_cacher_abstract import PageCacherAbstract
 from page_parser.page_parser_abstract import PageParserAbstract
 from request_maker.request_maker_abstract import RequestMakerAbstract
-from utils.content_saver import ContentSaver
 from utils.url_normaliser import URLNormaliser
 
 
 class Crawler:
     def __init__(self, site_url: str, page_cacher: PageCacherAbstract,
-                 request_maker: RequestMakerAbstract, page_parser: PageParserAbstract, timeout: int,
-                 threads_cont: int, sleep_seconds: int, empty_loop_sleep_seconds: float = 0.1):
+                 request_maker: RequestMakerAbstract, page_parser: PageParserAbstract,
+                 content_saver: ContentSaverAbstract, timeout: int, threads_cont: int, sleep_seconds: int,
+                 empty_loop_sleep_seconds: float = 0.1):
         self.page_cacher = page_cacher
         self.request_maker = request_maker
         self.page_parser = page_parser
+        self.content_saver = content_saver
         self.timeout = timeout
         self.threads_cont = threads_cont
         self.sleep_seconds = sleep_seconds
@@ -76,7 +77,8 @@ class Crawler:
         keys = await self.page_cacher.get_keys()
         for key in keys:
             item = await self.page_cacher.get_item(key)
-            filepath = ContentSaver.save_page(content_path=content_path, url=item.url_normalised, content=item.content)
+            filepath = self.content_saver.save_page(content_path=content_path, url=item.url_normalised,
+                                                    content=item.content)
             self.log(f'Saved {item.url_normalised} to {filepath}')
 
     def log(self, message: str) -> None:

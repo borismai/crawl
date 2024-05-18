@@ -1,10 +1,11 @@
 from asyncio import sleep
-from unittest import mock
 from urllib.parse import urlparse
 
 import pytest
 from pathlib import Path
 
+
+from content_saver.content_saver_abstract import ContentSaverAbstract
 from crawler import Crawler
 from page_cacher.page_cacher import PageCacher
 from page_cacher.page_cache_item import PageCacheItemStatus
@@ -80,6 +81,15 @@ class FakeRequestMaker(RequestMaker):
         return result
 
 
+class ContentSaverStub(ContentSaverAbstract):
+    def __init__(self):
+        self.saved_pages = {}
+
+    def save_page(self, content_path: Path, url: str, content: str) -> Path:
+        self.saved_pages[url] = content
+        return Path('/tmp')
+
+
 def __get_path_mark(response_text):
     for line in response_text.split('\n'):
         if line.startswith('#path'):
@@ -122,9 +132,10 @@ async def test_fake_request_maker(url, path_mark, query_mark, expected_exception
 async def test_crawler():
     site_url = 'http://d1'
     page_cacher = PageCacher()
+    content_saver = ContentSaverStub()
     crawler = Crawler(site_url=site_url, page_cacher=page_cacher, request_maker=FakeRequestMaker(),
-                      page_parser=PageParser(url=site_url), timeout=0, threads_cont=2, sleep_seconds=0,
-                      empty_loop_sleep_seconds=0.1)
+                      page_parser=PageParser(url=site_url), content_saver=content_saver, timeout=0, threads_cont=2,
+                      sleep_seconds=0, empty_loop_sleep_seconds=0.1)
     await crawler.crawl()
 
     keys = await page_cacher.get_keys()
@@ -142,14 +153,6 @@ async def test_crawler():
 
     assert EXPECTED_URL_RESULTS == url_results
 
-    logged_lines = []
+    await crawler.dump(Path('/tmp'))
 
-    def _log_line(line):
-        logged_lines.append(line)
-
-    with (mock.patch('pathlib.Path.write_text'), mock.patch('crawler.Crawler.log', side_effect=_log_line), mock.
-            patch('utils.content_saver.randint', return_value=333)):
-        content_path = Path('/tmp/some/')
-        await crawler.dump(content_path)
-
-    assert EXPECTED_SAVING_MESSAGES == set(logged_lines)
+    assert set(EXPECTED_URL_RESULTS.keys()) == set(content_saver.saved_pages.keys())

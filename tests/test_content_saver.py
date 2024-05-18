@@ -1,10 +1,15 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest import mock
 
 import pytest
 
-from utils.content_saver import ContentSaver
+from content_saver.content_saver import ContentSaver
+
+
+class ContentSaverStub(ContentSaver):
+    @classmethod
+    def get_uniq_name(cls):
+        return 333
 
 
 @pytest.mark.parametrize('url, path_expected', [
@@ -17,8 +22,7 @@ from utils.content_saver import ContentSaver
     ('http://ya.ru/d1/index.html?q=v&qq=vv',    '/tmp/dump/d1/index.html?q=v&qq=vv'),
 ])
 def test_get_absolute_path(url, path_expected):
-    with mock.patch('utils.content_saver.randint', return_value=333):
-        assert path_expected == str(ContentSaver.get_absolute_path(Path('/tmp/dump/'), url))
+    assert path_expected == str(ContentSaverStub.get_absolute_path(Path('/tmp/dump/'), url))
 
 
 @pytest.mark.parametrize('url, filepath', [
@@ -32,11 +36,9 @@ def test_get_absolute_path(url, path_expected):
 ])
 def test_save(url, filepath):
     with TemporaryDirectory() as tmpdir:
-        with mock.patch('utils.content_saver.randint', return_value=333):
-
-            content_dir = Path(tmpdir)
-            content = '1'
-            saved_path = ContentSaver.save_page(content_dir, url, content)
-            saved_path_expected = content_dir / filepath
-            assert saved_path.is_file()
-            assert saved_path_expected == saved_path
+        content_dir = Path(tmpdir)
+        content = '1'
+        saved_path = ContentSaverStub.save_page(content_dir, url, content)
+        saved_path_expected = content_dir / filepath
+        assert saved_path.is_file()
+        assert saved_path_expected == saved_path
